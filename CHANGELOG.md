@@ -1,5 +1,38 @@
 # Change Log
 
+## Version 1.2.14
+
+### 新特性
+
+- 重命名项目为 "Roon Album Art 显示器"
+- 优化了界面设计和用户体验
+- 新增 Docker 容器化部署支持
+- 默认端口更改为 9660
+- 新增自动字体缩放功能
+- 优化了响应式设计
+
+### 技术改进
+
+- 更新了项目结构和代码组织
+- 增强了代码质量控制
+- 改进了错误处理机制
+- 优化了 WebSocket 连接稳定性
+- 增加了健康检查机制
+
+### 文档更新
+
+- 完善了中文文档支持
+- 更新了安装和使用说明
+- 添加了详细的部署文档
+- 优化了故障排除指南
+
+### 其他改进
+
+- 增强了安全性配置
+- 优化了资源缓存策略
+- 改进了断线重连机制
+- 完善了日志记录系统
+
 
 ## Version 1.2.13.1
 
@@ -231,7 +264,7 @@ Please run `npm install` after upgrading due to new dependencies.
 
 - After switching a zone, the zone_id did not update for the controls. This could lead to controlling the previous zone with the new zone's controls.
 - Tweaked jquery.simplemarquee.js to use "span" instead of "div". Caused problems with CSS layouts.
-- Rewrote zone message parser to handle multiple events per message. Caused problems with zone list improperly reflecting grouped and ungrouped zones. Likely root cause of previously reported problem with repeated listings in Zone Listings.
+- Rewritten zone message parser to handle multiple events per message. Caused problems with zone list improperly reflecting grouped and ungrouped zones. Likely root cause of previously reported problem with repeated listings in Zone Listings.
 
 ## Version 1.0.1
 
