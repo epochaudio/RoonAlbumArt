@@ -1,89 +1,85 @@
-# Roon 网页控制器
+# Roon Album Art 显示器
 
-这是一个用于 Roon 音乐播放器的网页控制界面，让你可以通过网页浏览器来控制 Roon 的播放。
+优雅的 Roon 专辑封面显示工具，让您的音乐聆听体验更加视觉化。
 
-## 功能特性
+## 主要特性
 
-- 支持多区域(Zone)控制
-- 实时音量调节
-- 播放控制（播放/暂停/上一曲/下一曲/停止）
-- 播放设置调整（随机播放/自动电台/循环播放）
-- 专辑封面显示（支持高清4K图片）
-- 响应式网页设计
-- WebSocket 实时状态更新
-- Docker 容器化部署支持
+- 高清专辑封面显示（支持4K分辨率）
+- 实时更新当前播放状态
+- 支持多种显示模式：
+  - 全屏封面显示
+  - 并排显示模式
+  - 标准播放界面
+- 响应式设计，适配各种屏幕尺寸
+- WebSocket 实时数据更新
+- 轻量级 Docker 部署
 
 ## 系统要求
 
-### Docker 部署
 - Docker
-- Docker Compose
-- Roon Core 已安装并运行
-
-### 直接部署
-- Node.js
 - Roon Core 已安装并运行
 - 网页浏览器
 
-## 安装和运行
+## 快速开始
 
-### 方式一：Docker 部署（推荐）
+### 方式一：使用 Docker Compose（推荐）
 
-1. 克隆或下载此仓库
-2. 在项目目录下运行：
+1. 创建 `docker-compose.yml` 文件：
+```yaml
+version: '3'
+services:
+  roonalbumart:
+    image: epochaudio/roonalbumart:latest
+    container_name: roonalbumart
+    ports:
+      - "9660:9660"
+    restart: unless-stopped
+```
+
+2. 运行容器：
 ```bash
 docker-compose up -d
 ```
 
-这将自动构建镜像并在后台启动容器。容器会自动设置为在系统启动时运行。
+### 方式二：直接使用 Docker
 
-### 方式二：直接部署
-
-1. 克隆或下载此仓库
-2. 安装依赖包：
 ```bash
-npm install
-```
-3. 运行应用：
-```bash
-node app.js --port 9660
+docker run -d \
+  --name roonalbumart \
+  -p 9660:9660 \
+  --restart unless-stopped \
+  epochaudio/roonalbumart:latest
 ```
 
-## 访问方式
+## 使用方法
 
-启动服务后，打开浏览器访问：`http://<你的IP>:9660`
+1. 启动服务后，打开浏览器访问：`http://<你的IP>:9660`
+2. 首次使用时，需要在 Roon Core 中授权此扩展
+3. 选择您喜欢的显示模式：
 
-注意：
-- 首次使用时需要在 Roon Core 中授权此扩展
-- 确保防火墙已开放 9660 端口
+### 显示模式说明
 
-## 配置选项
+- **标准播放界面** (`/nowplaying.html`)
+  - 完整的播放控制界面
+  - 显示专辑封面、音乐信息和播放控制
+  - 支持主题切换（深色、主色调、封面）
+  - 包含音量控制和播放设置（循环、随机、电台）
+  - 支持4K专辑封面显示
 
-### Docker 配置
-服务默认运行在 9660 端口上。如需修改，请同时更新：
-- Dockerfile 中的 `EXPOSE` 和 `CMD` 命令
-- 确保防火墙规则相应更新
+- **全屏显示模式** (`/fullscreen.html`)
+  - 全屏优化的播放控制界面
+  - 最大化显示区域利用
+  - 适合大屏幕显示
 
-### 命令行参数（仅适用于直接部署）
-- `--help` 或 `-h`: 显示帮助信息
-- `--port` 或 `-p`: 指定服务器监听端口（默认：9660）
- 
+- **并排显示模式** (`/side-by-side.html`)
+  - 左侧显示播放控制界面
+  - 右侧显示音乐库浏览器
+  - 适合同时控制播放和浏览音乐库
 
-## 最近更新
-
-### 2024年更新
-1. 界面简化
-   - 移除了右上角菜单按钮和相关功能
-   - 删除了音乐库切换功能
-   - 删除了所有音乐库相关文件（library.html、library.js、library.css）
-   - 移除了 Library、Playlists、My Live Radio、Genres、TIDAL、Qobuz、Settings 等菜单项
-   - 简化了用户界面，专注于播放控制
-2. Docker 配置更新
-   - 服务名称更改为 roonalbumart
-
-## 版本信息
-
-当前版本：1.0.1
+提示：您可以根据不同场景选择合适的显示模式：
+- 普通使用：推荐使用标准播放界面
+- 大屏幕显示：推荐使用全屏显示模式
+- 音乐探索：推荐使用并排显示模式
 
 ## 致谢
 
