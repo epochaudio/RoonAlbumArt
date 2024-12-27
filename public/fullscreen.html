@@ -7,69 +7,215 @@
     <meta name="format-detection" content="telephone=no" />
     <link rel="apple-touch-icon" href="/favicons/apple-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script>
-      (function(a, b, c) {
-        if (c in b && b[c]) {
-          var d,
-            e = a.location,
-            f = /^(a|html)$/i;
-          a.addEventListener(
-            "click",
-            function(a) {
-              d = a.target;
-              while (!f.test(d.nodeName)) d = d.parentNode;
-              "href" in d &&
-                (d.href.indexOf("http") || ~d.href.indexOf(e.host)) &&
-                (a.preventDefault(), (e.href = d.href));
-            },
-            !1
-          );
-        }
-      })(document, window.navigator, "standalone");
-    </script>
-    <link
-      rel="shortcut icon"
-      href="/favicons/favicon.ico"
-      type="image/x-icon"
-    />
+    <link rel="shortcut icon" href="/favicons/favicon.ico" type="image/x-icon" />
     <link rel="icon" href="/favicons/favicon.ico" type="image/x-icon" />
-    <link rel="manifest" href="/favicons/manifest.json" />
     <link rel="stylesheet" type="text/css" href="/css/site.css" />
     <script src="/jquery/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/color-thief.js"></script>
+    <script src="/js-cookie/js.cookie.js"></script>
     <script src="/js/fullscreen.js"></script>
-
     <style>
-      iframe {
-        border: none;
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
       }
 
-      .section {
-        height: 100%;
-        width: 100%;
+      .fullscreen-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
       }
 
-      #pageLoading {
-        background-color: #232629;
-        color: #eff0f1;
+      #clock-container {
+        width: 80vw;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .flip-clock {
+        display: flex;
+        gap: 4px;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 10px 20px;
+        border-radius: 12px;
+      }
+
+      .flip-unit {
+        position: relative;
+        width: 60px;
+        height: 80px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        text-align: center;
+        font-family: 'Lato', sans-serif;
+        font-size: 3em;
+        font-weight: bold;
+        color: #fff;
+        line-height: 80px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      }
+
+      .flip-unit::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 1px;
+        background: rgba(255,255,255,0.1);
+      }
+
+      .time-separator {
+        font-size: 3em;
+        font-weight: bold;
+        color: #fff;
+        line-height: 80px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+      }
+
+      #pairDisabled {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      }
+
+      .messages {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px 50px;
+        border-radius: 15px;
+        text-align: center;
+        color: #fff;
+        font-size: 1.5em;
+        line-height: 1.5;
+        max-width: 80%;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+
+      .messages h2 {
+        margin: 0 0 20px 0;
+        color: #1d99f3;
+      }
+
+      #coverImage {
+        width: 80vw;
+        height: auto;
+        max-height: 70vh;
+        object-fit: contain;
+        display: block;
+      }
+
+      #coverBackground {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        filter: blur(20px) opacity(0.3);
+      }
+
+      #colorBackground {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -2;
+        transition: background-color 1s ease;
+      }
+
+      #exitFullscreen {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        color: white;
+        cursor: pointer;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+        width: 48px;
+        height: 48px;
+        padding: 12px;
         z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #exitFullscreen:hover {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.9);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: scale(1.05);
+      }
+
+      #exitFullscreen svg {
+        width: 24px;
+        height: 24px;
       }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com"> 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;900&display=swap" rel="stylesheet">  
   </head>
   <body>
-    <div id="nowPlaying" class="fullscreenFlex">
-      <iframe class="section" src="nowplaying.html"></iframe>
+    <div id="coverBackground"></div>
+    <div id="colorBackground"></div>
+    <div class="fullscreen-container">
+      <div id="clock-container">
+        <div class="flip-clock">
+          <div class="flip-unit hours">00</div>
+          <div class="time-separator">:</div>
+          <div class="flip-unit minutes">00</div>
+        </div>
+      </div>
+      <img id="coverImage" src="/img/transparent.png" alt="Album Cover">
+      <button id="exitFullscreen" onclick="window.location.href='/nowplaying.html'" aria-label="切换到播放控制页面">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+        </svg>
+      </button>
     </div>
 
-    <div id="pairDisabled" class="fullscreenFlex">
+    <div id="pairDisabled" style="display: none;">
       <div class="messages">
-        此扩展程序未启用。请使用 Roon 客户端来启用它。
+        <h2>等待 Roon Core 授权</h2>
+        <p>请在 Roon Core 设置中启用此扩展</p>
+        <p>设置 → 扩展 → 启用 RoonAlbumArt</p>
       </div>
     </div>
 
-    <div id="pageLoading" class="fullscreenFlex">&nbsp;</div>
+    <script>
+      function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        
+        document.querySelector('.hours').textContent = hours;
+        document.querySelector('.minutes').textContent = minutes;
+      }
+
+      setInterval(updateClock, 1000);
+      updateClock();
+    </script>
   </body>
 </html>
