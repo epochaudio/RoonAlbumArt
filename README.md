@@ -32,7 +32,7 @@ services:
     image: epochaudio/roonalbumart:latest
     container_name: roonalbumart
     ports:
-      - "9660:9660"
+      - "3666:3666"
     restart: unless-stopped
 ```
 
@@ -54,7 +54,7 @@ docker run -d \
 
 ## 使用方法
 
-1. 启动服务后，打开浏览器访问：`http://<你的IP>:9660`
+1. 启动服务后，打开浏览器访问：`http://<你的IP>:3666`
 2. 首次使用时，需要在 Roon Core 中授权此扩展
 3. 在界面中选择您要控制的 Roon 区域（Zone）
 
