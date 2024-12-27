@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 1.2.14
+## Version 1.2.15
 
 ### 新特性
 
@@ -10,6 +10,10 @@
 - 默认端口更改为 9660
 - 新增自动字体缩放功能
 - 优化了响应式设计
+- 优化了全屏显示模式的界面设计
+- 新增翻页时钟显示功能
+- 改进了主题切换效果
+- 优化了页面切换按钮的交互体验
 
 ### 技术改进
 
@@ -18,6 +22,10 @@
 - 改进了错误处理机制
 - 优化了 WebSocket 连接稳定性
 - 增加了健康检查机制
+- 优化了 WebSocket 连接稳定性
+- 改进了图片加载机制
+- 优化了 CSS 样式结构
+- 提升了代码可维护性
 
 ### 文档更新
 
@@ -33,6 +41,36 @@
 - 改进了断线重连机制
 - 完善了日志记录系统
 
+### 界面改进
+
+- 重新设计了时钟显示样式，采用翻页效果
+- 简化了时间显示，仅显示小时和分钟
+- 优化了页面切换按钮的视觉效果
+- 改进了授权等待提示的显示效果
+
+### 功能优化
+
+- 简化了页面切换逻辑
+- 优化了主题切换的性能
+- 改进了背景切换的过渡效果
+- 增强了界面响应速度
+
+## Version 1.2.14
+
+Forked from the original repo at https://github.com/pluggemi/roon-web-controller with the following modifications done by Miemo Penttinen:
+
+Additional setting:
+- you can now toggle scrolling of longer titles and names on and off in the settings, defaults to scrolling still as earlier versions
+
+Visual tweaks:
+- changed the typeface to Lato so it's same as what Roon uses in their apps
+- changed the SVG icons to use rounded variants of the Material Icons to go visually better with the smoother shape of the Lato typeface
+- highlight color changed to Roon purple (or actually slightly brighter for better visibility)
+- tweaks to the visual hierarchy between the elements in #containerMusicInfo
+- tweaks to the album image style
+
+Bug fixes:
+- SVG icons size now much better even on newer Safari versions which had bad issues with earlier code
 
 ## Version 1.2.13.1
 
@@ -51,14 +89,12 @@ Visual tweaks:
 Bug fixes:
 - SVG icons size now much better even on newer Safari versions which had bad issues with earlier code
 
-
 ## Version 1.2.13
 
 NOTE: this is the final release of the 1.x series.
 
 Security
 - updated dependencies for security issues.
-
 
 ### Upgrade Notes
 
@@ -83,7 +119,6 @@ Otherwise, on the Node.js server:
 Accessibility
 
 - corrected name and aria label for one of the zone list buttons
-
 
 ## Version 1.2.11
 

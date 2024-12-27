@@ -1,7 +1,7 @@
 {
-  "name": "roon-web-controller",
-  "version": "1.0.1",
-  "description": "Roon Extension to create a web controller.",
+  "name": "封面艺术家",
+  "version": "1.0.2",
+  "description": "Roon Album Art 显示器",
   "main": "app.js",
   "author": "门耳朵制作",
   "license": "MIT",

@@ -8,6 +8,6 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 9660
+EXPOSE 3666
 
-CMD ["node", "app.js", "--port", "9660"] 
+CMD ["node", "app.js", "--port", "3666"] 

@@ -1,6 +1,6 @@
 "use strict";
 // Setup general variables
-var defaultListenPort = 8080;
+var defaultListenPort = 3666;
 
 var core, transport;
 var pairStatus = 0;
@@ -106,7 +106,7 @@ var RoonApiBrowse = require("node-roon-api-browse");
 var roon = new RoonApi({
   extension_id: "com.Epochaudio.web.controller",
   display_name: "RoonAlbumArt",
-  display_version: "1.0.1",
+  display_version: "1.0.2",
   publisher: "门耳朵制作",
   // log_level: "none",
   email: "masked",
