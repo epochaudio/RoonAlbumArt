@@ -106,7 +106,7 @@ var RoonApiBrowse = require("node-roon-api-browse");
 var roon = new RoonApi({
   extension_id: "com.Epochaudio.web.controller",
   display_name: "RoonAlbumArt",
-  display_version: "1.0.2",
+  display_version: "1.0.3",
   publisher: "门耳朵制作",
   // log_level: "none",
   email: "masked",

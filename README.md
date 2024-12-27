@@ -1,5 +1,7 @@
 # Roon Album Art 显示器
 
+[![版本](https://img.shields.io/badge/版本-1.0.3-blue.svg)](https://github.com/your-repo/roonalbumart)
+
 优雅的 Roon 专辑封面显示工具，让您的音乐聆听体验更加视觉化。
 
 ## 主要特性
