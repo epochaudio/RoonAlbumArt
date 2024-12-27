@@ -2,6 +2,7 @@ version: '3'
 
 services:
   roonalbumart:
+    image: epochaudio/roonalbumart:latest
     build: .
     network_mode: "host"
     restart: unless-stopped
