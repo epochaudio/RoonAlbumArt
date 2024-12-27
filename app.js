@@ -38,9 +38,9 @@ var options = commandLineArgs(optionDefinitions, { partial: true });
 
 var usage = getUsage([
   {
-    header: "Roon Web Controller",
+    header: "Roon 网页控制",
     content:
-      "A web based controller for the Roon Music Player.\n\nUsage: {bold node app.js <options>}"
+      "Roon Music Player 的网页控制器 .\n\nUsage: {bold node app.js <options>}"
   },
   {
     header: "Options",
@@ -48,7 +48,7 @@ var usage = getUsage([
   },
   {
     content:
-      "Project home: {underline https://github.com/pluggemi/roon-web-controller}"
+      "Project home: {underline https://shop236654229.taobao.com/}"
   }
 ]);
 
@@ -104,13 +104,13 @@ var RoonApiTransport = require("node-roon-api-transport");
 var RoonApiBrowse = require("node-roon-api-browse");
 
 var roon = new RoonApi({
-  extension_id: "com.pluggemi.web.controller",
-  display_name: "Web Controller",
-  display_version: "1.2.13",
-  publisher: "Mike Plugge",
+  extension_id: "com.Epochaudio.web.controller",
+  display_name: "RoonAlbumArt",
+  display_version: "1.0.1",
+  publisher: "门耳朵制作",
   // log_level: "none",
   email: "masked",
-  website: "https://github.com/pluggemi/roon-web-controller",
+  website: "https://shop236654229.taobao.com/",
 
   core_paired: function(core_) {
     core = core_;

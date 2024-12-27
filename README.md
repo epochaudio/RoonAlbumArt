@@ -1,238 +1,99 @@
-# Roon Web Controller 1.2.13.1
+# Roon 网页控制器
 
-This is an extension for the Roon music player that provides a web based remote.
+这是一个用于 Roon 音乐播放器的网页控制界面，让你可以通过网页浏览器来控制 Roon 的播放。
 
-NOTE: this is the final release of the 1.x series.
+## 功能特性
 
+- 支持多区域(Zone)控制
+- 实时音量调节
+- 播放控制（播放/暂停/上一曲/下一曲/停止）
+- 播放设置调整（随机播放/自动电台/循环播放）
+- 专辑封面显示（支持高清4K图片）
+- 响应式网页设计
+- WebSocket 实时状态更新
+- Docker 容器化部署支持
 
-## About the 1.2.13.1 version
+## 系统要求
 
-Forked from the original repo at https://github.com/pluggemi/roon-web-controller with the following modifications done by Miemo Penttinen:
+### Docker 部署
+- Docker
+- Docker Compose
+- Roon Core 已安装并运行
 
-Additional setting:
-- you can now toggle scrolling of longer titles and names on and off in the settings, defaults to scrolling still as earlier versions
+### 直接部署
+- Node.js
+- Roon Core 已安装并运行
+- 网页浏览器
 
-Visual tweaks:
-- changed the typeface to Lato so it's same as what Roon uses in their apps
-- changed the SVG icons to use rounded variants of the Material Icons to go visually better with the smoother shape of the Lato typeface
-- highlight color changed to Roon purple (or actually slightly brighter for better visibility)
-- tweaks to the visual hierarchy between the elements in #containerMusicInfo
-- tweaks to the album image style
+## 安装和运行
 
-Bug fixes:
-- SVG icons size now much better even on newer Safari versions which had bad issues with earlier code
+### 方式一：Docker 部署（推荐）
 
-
-End result: something that I myself enjoy using a bit better than the original.
-
-**NOTE: All the updates above are done just to make this more usable to myself. I've shared these in case someone else finds these usable, but I make no guarantees on them working on every possible setup out there. Also I have no interest in starting doing any other fixes or updates to the code.**
-
-Changes mentioned above have NOT been updated to the screenshots below. The rest of the README is from the original repo untouched.
-
-
-## New features
-
-Security
-- updated dependencies for security issues.
-
-See the [CHANGELOG.md](CHANGELOG.md) for complete list of changes
-
-### Upgrade notes
-
-The package dependencies have been updated to the latest versions. It is recommended to perform an update.
-
-If you followed the [Diet Pi installation](https://github.com/pluggemi/roon-web-controller/wiki/Diet-Pi-Installation) guide, follow these [update instructions](https://github.com/pluggemi/roon-web-controller/wiki/Diet-Pi-Installation#updating-the-web-controller-software)
-
-Otherwise, on the Node.js server:
-
-1. Stop the extension
-1. Run `git pull`
-1. Run `npm install`
-1. Run `npm update`
-1. Start the extension
-
-## Screenshots
-
-### Dark Theme
-
-![Dark Theme](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/dark-Portrait.png)
-![Dark Theme](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/dark-Landscape.png)
-
-Album Credit: [Julia Kent, Asperities](http://music.juliakent.com/album/asperities)
-
-### Cover Art Theme
-
-![Cover Art Theme](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/cover-Portrait.png)
-![Cover Art Theme](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/cover-Landscape.png)
-
-Album Credit: [Beats Antique, Blind Threshold](https://beatsantique.bandcamp.com/album/blind-threshold)
-
-### Dominant Color Theme
-
-The icons and text in this theme automatically adjust to show light or dark depending on which would be more readable.
-![Dominant Color Theme](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/color-Portrait.png)
-![Dominant Color Theme](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/color-Landscape.png)
-
-Album Credit: [Carbon Based Lifeforms, Twentythree](https://carbonbasedlifeforms.bandcamp.com/album/twentythree)
-
-### Library Browser - Home Screen
-
-![Library - Home](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/library-Portrait-home.png)
-![Library - Home](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/library-Landscape-home.png)
-
-### Library Browser - Artist Screen
-
-![Library - Artist](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/library-Portrait-artist.png)
-![Library - Artist](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/library-Landscape-artist.png)
-
-### Library Browser - Album Screen
-
-![Library - Album](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/library-Portrait-album.png)
-![Library - Album](https://raw.githubusercontent.com/pluggemi/project-screenshots/master/roon-web-controller/library-Landscape-album.png)
-
-## Installation
-
-Ensure that Node.js version 6.x or higher is installed.
-
-Grab the software:
-
-- Via git (preferred): `git clone https://github.com/pluggemi/roon-web-controller.git`
-- Or download and extract the zip file.
-
-Change directory into the software:
-`cd roon-web-controller`
-
-Install the Node.js modules
-`npm install`
-
-Run the application:
-`node app.js`
-
-On an existing Roon client, go to "Settings" then "Extensions". Click "Enable" beside "Web Controller".
-
-Open a web browser to your server at either "http://localhost:8080" or "http://(IP of Device):8080".
-
-### Firewall ports
-
-Many operating systems now have a firewall enabled by default. Make sure that the port that this is running is open on the firewall. By default, this is TCP port 8080. But this can be changed with the configuration file or command line options below.
-
-### (Optional) Local configuration file
-
-Simply copy `config/local.json.EXAMPLE` to `config/local.json` and edit `config/local.json` as needed.
-
-- `config/local.json` is not tracked by `git`, so it will not be clobbered with updates
-- `config/local.json.EXAMPLE` is tracked by `git` and will be updated in the future as new options are available
-
-Content of `config/local.json.EXAMPLE`
-
-```
-// Copy this file to "local.json" and change the port as desired.
-{
-  "server": {
-    "port": "1234"
-  }
-}
+1. 克隆或下载此仓库
+2. 在项目目录下运行：
+```bash
+docker-compose up -d
 ```
 
-### (Optional) Command Line Options
+这将自动构建镜像并在后台启动容器。容器会自动设置为在系统启动时运行。
 
-This is the output `node app.js -h` which shows usage of the command line options.
+### 方式二：直接部署
 
+1. 克隆或下载此仓库
+2. 安装依赖包：
+```bash
+npm install
 ```
-Roon Web Controller
-
- A web based controller for the Roon Media System.
-
- Usage: node app.js <options>
-
-Options
-
- -h, --help          Display this usage guide.
- -p, --port number   Specify the port the server listens on.
-
- Project home: https://github.com/pluggemi/roon-web-controller
+3. 运行应用：
+```bash
+node app.js --port 9660
 ```
 
-### (Optional) Sample systemd unit file
+## 访问方式
 
-[systemd](https://www.freedesktop.org/wiki/Software/systemd/) is the init system used by modern Linux systems. Here is a sample systemd unit file which can be used to automatically start this application at Linux system boot time.
+启动服务后，打开浏览器访问：`http://<你的IP>:9660`
 
-```
-[Unit]
-Description=NodeJS app - Roon Web Controller
-After=network.target
+注意：
+- 首次使用时需要在 Roon Core 中授权此扩展
+- 确保防火墙已开放 9660 端口
 
-[Service]
-User=node
-WorkingDirectory=/srv/node/roon-web-controller
-ExecStart=/usr/bin/node app.js
+## 配置选项
 
-[Install]
-WantedBy=multi-user.target
-```
+### Docker 配置
+服务默认运行在 9660 端口上。如需修改，请同时更新：
+- Dockerfile 中的 `EXPOSE` 和 `CMD` 命令
+- 确保防火墙规则相应更新
 
-#### Usage
+### 命令行参数（仅适用于直接部署）
+- `--help` 或 `-h`: 显示帮助信息
+- `--port` 或 `-p`: 指定服务器监听端口（默认：9660）
+ 
 
-To use this unit file:
+## 最近更新
 
-- Save this template to a file called `roon-web-controller.service`
-- Edit the `user` field to be the user running the application
-- Edit the `WorkingDirectory` field to be the location where the application is installed (**NOTE**: the `user` must have read and write access to this location!)
-- Using either `sudo` or as `root`, copy the edited `roon-web-controller.service` file to `/usr/lib/systemd/system`
-- Reload systemd: `sudo systemctl daemon-reload`
-- Start the application: `sudo systemctl start roon-web-controller.service`
-- Enable the application at boot up: `sudo systemctl enable roon-web-controller.service`
+### 2024年更新
+1. 界面简化
+   - 移除了右上角菜单按钮和相关功能
+   - 删除了音乐库切换功能
+   - 删除了所有音乐库相关文件（library.html、library.js、library.css）
+   - 移除了 Library、Playlists、My Live Radio、Genres、TIDAL、Qobuz、Settings 等菜单项
+   - 简化了用户界面，专注于播放控制
+2. Docker 配置更新
+   - 服务名称更改为 roonalbumart
 
-You can monitor the output of this application using `journalctl`.
+## 版本信息
 
-- To show the application output: `sudo journalctl -u roon-web-controller`
-- To follow the application output: `sudo journalctl -f -u roon-web-controller`
+当前版本：1.0.1
 
-**NOTE:**
-Some Linux distributions - including [DietPi](http://dietpi.com/) and [Software Collections](http://www.softwarecollections.org/) (addon repository for Red Hat, Centos, and Fedora) - install the Node.js binaries in a different location. You can find the executable by running `which node`. Adjust the `ExecStart` line accordingly.
+## 致谢
 
-Here is a list of common locations:
+本项目基于以下开源项目进行开发：
 
-- `/usr/bin/node`
-- `/usr/local/bin/node`
-- `/opt/rh/rh-nodejs6/root/usr/bin/node`
-- `/opt/rh/rh-nodejs8/root/usr/bin/node`
+- [Roon Web Controller](https://github.com/pluggemi/roon-web-controller) - 原始项目由 Mike Plugge 开发
+- [Roon Web Controller (Miemo Fork)](https://github.com/miemo/roon-web-controller) - 提供了界面优化版本
 
-## Credits
-
-In addition to those packages installed via npm, this project uses:
-
-- [jquery.simplemarquee.js](https://github.com/IndigoUnited/jquery.simplemarquee) to automatically scroll the long text
-- Color palette from the KDE Visual Design Group [Human Interface Guidelines](https://community.kde.org/KDE_Visual_Design_Group/HIG/Color)
-- Icons from [Material Design Icons](https://materialdesignicons.com/)
-- [Color Thief](https://github.com/lokesh/color-thief) to calculate the dominant color of the album art
-
-Thanks go to [st0g1e](https://github.com/st0g1e) for doing one of the first [web clients](https://github.com/st0g1e/roon-extension-ws-player) for the Roon API.
-
-Thanks go to [jcharr1](https://github.com/jcharr1) for suggesting and doing the initial implementation of OS native song notifications.
-
-And of course thanks go to [Roon Labs](https://roonlabs.com/) for making the music player and the [APIs](https://github.com/RoonLabs).
-
-## License
-
-# The MIT License (MIT)
-
-Copyright (c) 2019 Mike Plugge
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+特别感谢：
+- Mike Plugge (@pluggemi) 创建了最初的 Roon Web Controller
+- Miemo Penttinen 提供了界面优化版本
+- Roon Labs 提供了优秀的音乐播放器和 API
+- 所有为这个项目做出贡献的开发者
