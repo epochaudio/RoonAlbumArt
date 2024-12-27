@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Roon Web Controller</title>
+    <title>Roon 网页控制器</title>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="format-detection" content="telephone=no" />
@@ -54,39 +54,6 @@
         color: #eff0f1;
         z-index: 1000;
       }
-
-      #buttonMenu {
-        position: absolute;
-        color: #eff0f1;
-        top: 0;
-        right: 0;
-        height: 33px;
-        width: auto;
-        z-index: 100;
-        border: none;
-      }
-
-
-      @media screen and (orientation:portrait) {
-
-        #buttonMenu {
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 0 0 10px 10px;
-            opacity: 1;
-        }
-
-      }
-
-      @media screen and (orientation:landscape) {
-
-        #buttonMenu {
-            background-color: transparent;
-            border-radius: 0;
-            opacity: 0.4;
-        }
-      }
-
-
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
@@ -97,53 +64,11 @@
       <iframe class="section" src="nowplaying.html"></iframe>
     </div>
 
-    <div id="libraryBrowser" class="fullscreenFlex">
-      <iframe class="section" src="library.html"></iframe>
-    </div>
-
     <div id="pairDisabled" class="fullscreenFlex">
       <div class="messages">
-        This extension is not enabled. Please use a Roon client to enable it.
+        此扩展程序未启用。请使用 Roon 客户端来启用它。
       </div>
     </div>
-
-    <div id="overlayMainMenu" class="overlay">
-      <div
-        class="overlayBackground"
-        onclick="$('#overlayMainMenu').hide()"
-      ></div>
-      <div class="overlayContent">
-        <div class="overlayList">
-          <button
-            type="button"
-            class="buttonOverlay"
-            onclick="showSection('nowPlaying')"
-            name="Show now playing"
-            aria-label="Show now playing"
-          >
-            Now Playing
-          </button>
-          <button
-            type="button"
-            class="buttonOverlay"
-            onclick="showSection('libraryBrowser')"
-            name="Show library browser"
-            aria-label="Show library browser"
-          >
-            Library
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <button
-      type="button"
-      id="buttonMenu"
-      class="buttonTrans"
-      onclick="$('#overlayMainMenu').show()"
-      name="Show main menu"
-      aria-label="Show main menu"
-    ></button>
 
     <div id="pageLoading" class="fullscreenFlex">&nbsp;</div>
   </body>

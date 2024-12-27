@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Roon Web Controller - Now Playing</title>
+    <title>Roon 网页控制器 - 正在播放</title>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="format-detection" content="telephone=no" />
@@ -60,15 +60,15 @@
     <div id="colorBackground"></div>
     <div id="notPlaying">
       <div class="messages">
-        <p>Nothing playing on</p>
+        <p>当前没有播放内容：</p>
         <button
           type="button"
           class="buttonZoneName buttonActive messages"
           onclick="$('#overlayZoneList').show()"
-          name="Zone List"
-          aria-label="Zone List"
+          name="区域列表"
+          aria-label="区域列表"
         >
-          zoneList
+          区域列表
         </button>
       </div>
     </div>
@@ -83,22 +83,22 @@
             type="button"
             id="controlPrev"
             class="buttonFillHeight playerButton"
-            name="Previous"
-            aria-label="Previous"
+            name="上一曲"
+            aria-label="上一曲"
           ></button>
           <button
             type="button"
             id="controlPlayPauseStop"
             class="buttonFillHeight playerButton"
-            name="Play Pause"
-            aria-label="Play Pause"
+            name="播放/暂停"
+            aria-label="播放/暂停"
           ></button>
           <button
             type="button"
             id="controlNext"
             class="buttonFillHeight playerButton"
-            name="Next"
-            aria-label="Next"
+            name="下一曲"
+            aria-label="下一曲"
           ></button>
         </div>
         <div id="containerTrackSeek">
@@ -115,10 +115,10 @@
             class="buttonZoneName buttonAvailable colorChange"
             id="nowplayingZoneList"
             onclick="$('#overlayZoneList').show()"
-            name="Zone List"
-            aria-label="Zone List"
+            name="区域列表"
+            aria-label="区域列表"
           >
-            zoneList
+            区域列表
           </button>
         </div>
         <div id="controlsSettings">
@@ -142,16 +142,16 @@
             class="buttonFillHeight settingsButton buttonAvailable"
             id="buttonVolume"
             onclick="$('#overlayVolume').show()"
-            name="Show Volume Controls"
-            aria-label="Show Volume Controls"
+            name="显示音量控制"
+            aria-label="显示音量控制"
           ></button>
           <button
             type="button"
             class="buttonFillHeight settingsButton buttonAvailable"
             id="buttonSettings"
             onclick="$('#overlaySettings').show()"
-            name="Show Settings"
-            aria-label="Show Settings"
+            name="显示设置"
+            aria-label="显示设置"
           ></button>
         </div>
       </div>
@@ -182,43 +182,43 @@
               class="buttonOverlay"
               id="buttonThemeDark"
               onclick="setTheme('dark')"
-              name="Select dark theme"
-              aria-label="Select dark theme"
+              name="选择深色主题"
+              aria-label="选择深色主题"
             >
-              Dark
+              深色
             </button>
             <button
               type="button"
               class="buttonOverlay"
               id="buttonThemeColor"
               onclick="setTheme('color')"
-              name="Select dominant color theme"
-              aria-label="Select dominant color theme"
+              name="选择主色调主题"
+              aria-label="选择主色调主题"
             >
-              Color
+              主色调
             </button>
             <button
               type="button"
               class="buttonOverlay"
               id="buttonThemeCover"
               onclick="setTheme('cover')"
-              name="Select cover art theme"
-              aria-label="Select cover art theme"
+              name="选择封面主题"
+              aria-label="选择封面主题"
             >
-              Cover
+              封面
             </button>
           </div>
           <hr />
           <div class="overlayListRow">
-            <div class="textBold">Notifications</div>
+            <div class="textBold">通知</div>
             <div>
               <label class="settingsSwitch">
                 <input
                   type="checkbox"
                   id="notificationsSwitch"
                   onclick="toggleNotifications()"
-                  name="Toggle desktop notifications on song change"
-                  aria-label="Toggle desktop notifications on song change"
+                  name="切换歌曲变更桌面通知"
+                  aria-label="切换歌曲变更桌面通知"
                 />
                 <span class="settingsSlider"></span>
               </label>
@@ -226,15 +226,15 @@
           </div>
           <hr />
           <div class="overlayListRow">
-            <div class="textBold">Use Circle Icons</div>
+            <div class="textBold">使用圆形图标</div>
             <div>
               <label class="settingsSwitch">
                 <input
                   type="checkbox"
                   id="circleIconsSwitch"
                   onclick="toggleCircleIcon()"
-                  name="Toggle circle icons for playback controls"
-                  aria-label="Toggle circle icons for playback controls"
+                  name="切换播放控制使用圆形图标"
+                  aria-label="切换播放控制使用圆形图标"
                 />
                 <span class="settingsSlider"></span>
               </label>
@@ -242,15 +242,15 @@
           </div>
           <hr />
           <div class="overlayListRow">
-            <div class="textBold">Use 4k Images</div>
+            <div class="textBold">使用4K图像</div>
             <div>
               <label class="settingsSwitch">
                 <input
                   type="checkbox"
                   id="4kImagesSwitch"
                   onclick="toggle4kImages()"
-                  name="Toggle 4k cover images"
-                  aria-label="Toggle 4k cover images"
+                  name="切换4K图像"
+                  aria-label="切换4K图像"
                 />
                 <span class="settingsSlider"></span>
               </label>
@@ -258,15 +258,15 @@
           </div>
           <hr />
           <div class="overlayListRow">
-            <div class="textBold">Disable screensaver while playing</div>
+            <div class="textBold">播放时禁用屏幕保护</div>
             <div>
               <label class="settingsSwitch">
                 <input
                   type="checkbox"
                   id="screensaverSwitch"
                   onclick="toggleScreensaver()"
-                  name="Toggle disabling the screen saver"
-                  aria-label="Toggle disabling the screen saver"
+                  name="切换播放时禁用屏幕保护"
+                  aria-label="切换播放时禁用屏幕保护"
                 />
                 <span class="settingsSlider"></span>
               </label>
@@ -274,22 +274,20 @@
           </div>
           <hr />
           <div class="overlayListRow">
-            <div class="textBold">Scroll long texts</div>
+            <div class="textBold">滚动长文本</div>
             <div>
               <label class="settingsSwitch">
                 <input
                   type="checkbox"
                   id="scrollSwitch"
                   onclick="toggleScroll()"
-                  name="Toggle scrolling of long texts"
-                  aria-label="Toggle scrolling of long texts"
+                  name="切换长文本滚动"
+                  aria-label="切换长文本滚动"
                 />
                 <span class="settingsSlider"></span>
               </label>
             </div>
           </div>
-
-
           <hr />
         </div>
       </div>
