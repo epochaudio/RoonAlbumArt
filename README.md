@@ -46,9 +46,10 @@ docker-compose up -d
 ```bash
 docker run -d \
   --name roonalbumart \
-  -p 9660:9660 \
+  --network host \
   --restart unless-stopped \
   epochaudio/roonalbumart:latest
+
 ```
 
 ## 使用方法
