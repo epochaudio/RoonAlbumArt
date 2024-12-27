@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Roon 网页控制器</title>
+    <title>Music will keep us alive</title>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="format-detection" content="telephone=no" />
@@ -31,55 +31,6 @@
         width: 100vw;
       }
 
-      #clock-container {
-        width: 80vw;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-      }
-
-      .flip-clock {
-        display: flex;
-        gap: 4px;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 10px 20px;
-        border-radius: 12px;
-      }
-
-      .flip-unit {
-        position: relative;
-        width: 60px;
-        height: 80px;
-        background: rgba(0, 0, 0, 0.5);
-        border-radius: 8px;
-        text-align: center;
-        font-family: 'Lato', sans-serif;
-        font-size: 3em;
-        font-weight: bold;
-        color: #fff;
-        line-height: 80px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-      }
-
-      .flip-unit::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 50%;
-        height: 1px;
-        background: rgba(255,255,255,0.1);
-      }
-
-      .time-separator {
-        font-size: 3em;
-        font-weight: bold;
-        color: #fff;
-        line-height: 80px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-      }
-
       #pairDisabled {
         position: fixed;
         top: 0;
@@ -104,6 +55,7 @@
         line-height: 1.5;
         max-width: 80%;
         backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         border: 1px solid rgba(255,255,255,0.1);
       }
@@ -181,13 +133,6 @@
     <div id="coverBackground"></div>
     <div id="colorBackground"></div>
     <div class="fullscreen-container">
-      <div id="clock-container">
-        <div class="flip-clock">
-          <div class="flip-unit hours">00</div>
-          <div class="time-separator">:</div>
-          <div class="flip-unit minutes">00</div>
-        </div>
-      </div>
       <img id="coverImage" src="/img/transparent.png" alt="Album Cover">
       <button id="exitFullscreen" onclick="window.location.href='/nowplaying.html'" aria-label="切换到播放控制页面">
         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -203,19 +148,5 @@
         <p>设置 → 扩展 → 启用 RoonAlbumArt</p>
       </div>
     </div>
-
-    <script>
-      function updateClock() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        
-        document.querySelector('.hours').textContent = hours;
-        document.querySelector('.minutes').textContent = minutes;
-      }
-
-      setInterval(updateClock, 1000);
-      updateClock();
-    </script>
   </body>
 </html>
