@@ -36,7 +36,7 @@
           if (!isButtonHovered) { // 再次检查鼠标是否在按钮上
             document.body.style.cursor = 'none';
           }
-        }, 2000); // 2秒后隐藏鼠标
+        }, 1000); // 改为1秒后隐藏鼠标
       }
 
       // 检测是否为iOS设备
@@ -110,6 +110,15 @@
           fullscreenButton.style.display = 'none';
         }
 
+        // 添加鼠标移动监听
+        if (!isTouch) {
+          document.addEventListener('mousemove', handleMouseMove);
+          // 初始状态隐藏鼠标
+          setTimeout(() => {
+            document.body.style.cursor = 'none';
+          }, 1000);
+        }
+
         // 为封面图片添加点击事件
         const coverImage = document.getElementById('coverImage');
         if (coverImage) {
@@ -124,46 +133,41 @@
             coverImage.addEventListener('mouseenter', () => {
               isButtonHovered = true;
               document.body.style.cursor = 'pointer';
-              const hint = document.createElement('div');
-              hint.className = 'fullscreen-hint';
-              hint.textContent = document.fullscreenElement ? '点击退出全屏' : '点击进入全屏';
-              document.querySelector('.fullscreen-container').appendChild(hint);
             });
             
             coverImage.addEventListener('mouseleave', () => {
               isButtonHovered = false;
               handleMouseMove();
-              const hint = document.querySelector('.fullscreen-hint');
-              if (hint) hint.remove();
             });
           } else if (!hasShownTip) {
-            // 触摸设备：首次访问时显示提示
+            // 触摸设备：首次访问时显示提示，3秒后自动消失
             const tip = document.createElement('div');
             tip.className = 'fullscreen-tip';
             tip.textContent = '点击封面切换全屏模式';
             document.querySelector('.fullscreen-container').appendChild(tip);
             
-            // 3秒后淡出提示
             setTimeout(function() {
               tip.style.opacity = '0';
               setTimeout(() => tip.remove(), 500);
             }, 3000);
             
-            // 记录已显示过提示
             localStorage.setItem('hasShownFullscreenTip', 'true');
           }
         }
 
         // 监听全屏状态变化
-        document.addEventListener('fullscreenchange', updateFullscreenHint);
-        document.addEventListener('webkitfullscreenchange', updateFullscreenHint);
-        document.addEventListener('mozfullscreenchange', updateFullscreenHint);
-        document.addEventListener('MSFullscreenChange', updateFullscreenHint);
+        document.addEventListener('fullscreenchange', updateFullscreenState);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenState);
+        document.addEventListener('mozfullscreenchange', updateFullscreenState);
+        document.addEventListener('MSFullscreenChange', updateFullscreenState);
 
-        function updateFullscreenHint() {
-          const hint = document.querySelector('.fullscreen-hint');
-          if (hint) {
-            hint.textContent = document.fullscreenElement ? '点击退出全屏' : '点击进入全屏';
+        function updateFullscreenState() {
+          if (!isTouch) {
+            setTimeout(() => {
+              if (!isButtonHovered) {
+                document.body.style.cursor = 'none';
+              }
+            }, 1000);
           }
         }
       });
