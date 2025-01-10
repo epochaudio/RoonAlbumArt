@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Music will keep us alive</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="apple-touch-icon" href="/favicons/apple-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      (function(a, b, c) {
+        if (c in b && b[c]) {
+          var d,
+            e = a.location,
+            f = /^(a|html)$/i;
+          a.addEventListener(
+            "click",
+            function(a) {
+              d = a.target;
+              while (!f.test(d.nodeName)) d = d.parentNode;
+              "href" in d &&
+                (d.href.indexOf("http") || ~d.href.indexOf(e.host)) &&
+                (a.preventDefault(), (e.href = d.href));
+            },
+            !1
+          );
+        }
+      })(document, window.navigator, "standalone");
+    </script>
+    <link
+      rel="shortcut icon"
+      href="/favicons/favicon.ico"
+      type="image/x-icon"
+    />
+    <link rel="icon" href="/favicons/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="/css/site.css" />
+    <link rel="stylesheet" type="text/css" href="/css/nowplaying.css" />
+    <script src="/jquery/jquery.min.js"></script>
+    <script src="/js/jquery.simplemarquee.js"></script>
+    <script src="/js/color-thief.js"></script>
+    <script src="/js-cookie/js.cookie.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/NoSleep.min.js"></script>
+    <script src="/js/nowplaying.js"></script>
+    <script>
+      let mouseTimer;
+      let isButtonHovered = false;
+
+      // 检测是否为触摸屏设备
+      function isTouchDevice() {
+        return (('ontouchstart' in window) ||
+          (navigator.maxTouchPoints > 0) ||
+          (navigator.msMaxTouchPoints > 0));
+      }
+
+      // 处理鼠标移动
+      function handleMouseMove() {
+        if (isButtonHovered) return; // 如果鼠标在按钮上，不要隐藏
+        document.body.style.cursor = 'default';
+        clearTimeout(mouseTimer);
+        mouseTimer = setTimeout(() => {
+          if (!isButtonHovered) { // 再次检查鼠标是否在按钮上
+            document.body.style.cursor = 'none';
+          }
+        }, 2000); // 2秒后隐藏鼠标
+      }
+
+      // 检测是否为iOS设备
+      function isIOS() {
+        return [
+          'iPad Simulator',
+          'iPhone Simulator',
+          'iPod Simulator',
+          'iPad',
+          'iPhone',
+          'iPod'
+        ].includes(navigator.platform)
+        || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+      }
+
+      // 优化的全屏切换函数
+      function toggleFullScreen() {
+        try {
+          if (isIOS()) {
+            // iOS设备特殊处理
+            if (document.documentElement.webkitEnterFullscreen) {
+              document.documentElement.webkitEnterFullscreen();
+            } else if (document.body.webkitEnterFullscreen) {
+              document.body.webkitEnterFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+              document.documentElement.webkitRequestFullscreen();
+            }
+            return;
+          }
+
+          // 其他设备的处理
+          if (!document.fullscreenElement &&
+              !document.webkitFullscreenElement &&
+              !document.mozFullScreenElement &&
+              !document.msFullscreenElement) {
+            const element = document.documentElement;
+            if (element.requestFullscreen) {
+              element.requestFullscreen();
+            } else if (element.webkitRequestFullscreen) {
+              element.webkitRequestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+              element.mozRequestFullScreen();
+            } else if (element.msRequestFullscreen) {
+              element.msRequestFullscreen();
+            }
+          } else {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+              document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+              document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+              document.msExitFullscreen();
+            }
+          }
+        } catch (err) {
+          console.log('全屏切换出错:', err);
+        }
+      }
+
+      $(document).ready(function() {
+        const isTouch = isTouchDevice();
+        const hasShownTip = localStorage.getItem('hasShownFullscreenTip');
+        
+        if (!isTouch) {
+          // 初始隐藏鼠标
+          document.body.style.cursor = 'none';
+
+          // 监听鼠标移动
+          document.addEventListener('mousemove', handleMouseMove);
+
+          // 为所有按钮添加悬停效果（排除封面图片容器）
+          const buttons = document.querySelectorAll('button, .settingsButton, .playerButton');
+          buttons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+              isButtonHovered = true;
+              document.body.style.cursor = 'pointer';
+              button.style.opacity = '1';
+              button.style.filter = 'brightness(1.2)';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+              isButtonHovered = false;
+              button.style.opacity = '';
+              button.style.filter = '';
+              // 如果鼠标离开按钮，启动隐藏计时器
+              handleMouseMove();
+            });
+          });
+
+          // 为封面图片容器单独添加鼠标指针效果
+          const coverImage = document.getElementById('containerCoverImage');
+          if (coverImage) {
+            coverImage.addEventListener('mouseenter', () => {
+              isButtonHovered = true;
+              document.body.style.cursor = 'pointer';
+            });
+            
+            coverImage.addEventListener('mouseleave', () => {
+              isButtonHovered = false;
+              handleMouseMove();
+            });
+          }
+        }
+
+        // 为封面图片容器添加点击事件
+        $('#containerCoverImage').on('click', function() {
+          toggleFullScreen();
+        });
+
+        // 针对不同设备类型的处理
+        if (isTouch) {
+          // 触摸设备：首次访问时显示提示，之后不再显示
+          if (!hasShownTip) {
+            const $tip = $('<div class="fullscreen-tip">点击封面进入全屏模式</div>');
+            $('#containerCoverImage').append($tip);
+            
+            // 3秒后淡出提示
+            setTimeout(function() {
+              $tip.fadeOut(500, function() {
+                $(this).remove();
+              });
+            }, 3000);
+            
+            // 记录已显示过提示
+            localStorage.setItem('hasShownFullscreenTip', 'true');
+          }
+        } else {
+          // 非触摸设备：保留鼠标悬停效果
+          $('#containerCoverImage').hover(
+            function() {
+              $(this).css('cursor', 'pointer');
+              $(this).append('<div class="fullscreen-hint"></div>');
+            },
+            function() {
+              $(this).find('.fullscreen-hint').remove();
+            }
+          );
+        }
+      });
+
+      $(window).on("orientationchange", function(event) {
+        fixFontSize();
+      });
+
+      $(window).resize(function() {
+        fixFontSize();
+      });
+
+      // 监听 Socket.IO 连接状态
+      socket.on('pairStatus', function(status) {
+        const pairDisabled = document.getElementById('pairDisabled');
+        if (status.pairEnabled) {
+          if (pairDisabled) {
+            pairDisabled.style.display = 'none';
+          }
+        } else {
+          if (pairDisabled) {
+            pairDisabled.style.display = 'flex';
+          }
+        }
+      });
+    </script>
+    <style>
+      #containerCoverImage {
+        position: relative;
+        transition: transform 0.3s ease;
+      }
+
+      /* 仅在非触摸设备上启用悬停效果 */
+      @media (hover: hover) {
+        #containerCoverImage:hover {
+          transform: scale(1.02);
+        }
+      }
+
+      .fullscreen-hint {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        pointer-events: none;
+        opacity: 0.8;
+      }
+
+      .fullscreen-hint::before {
+        content: "点击进入全屏";
+      }
+
+      /* 触摸设备的提示样式 */
+      .fullscreen-tip {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        pointer-events: none;
+        opacity: 0.9;
+        z-index: 1000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        white-space: nowrap;
+      }
+
+      /* 按钮基础样式 */
+      button, .settingsButton, .playerButton {
+        transition: all 0.3s ease;
+        opacity: 0.8;
+      }
+
+      /* 非触摸设备的按钮悬停效果 */
+      @media (hover: hover) {
+        button:hover, .settingsButton:hover, .playerButton:hover {
+          opacity: 1;
+          filter: brightness(1.2);
+        }
+      }
+
+      #pairDisabled {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      }
+
+      .messages {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px 50px;
+        border-radius: 15px;
+        text-align: center;
+        color: #fff;
+        font-size: 1.5em;
+        line-height: 1.5;
+        max-width: 80%;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+
+      .messages h2 {
+        margin: 0 0 20px 0;
+        color: #1d99f3;
+      }
+
+      /* 横屏布局时的容器样式 */
+      @media (orientation: landscape) {
+        #isPlaying {
+          display: flex;
+          align-items: center; /* 竖向居中 */
+          height: 100vh;
+        }
+
+        #containerCoverImage {
+          display: flex;
+          align-items: center; /* 封面图片竖向居中 */
+          height: 100%;
+        }
+
+        #containerMusicInfo {
+          display: flex;
+          flex-direction: column;
+          justify-content: center; /* 文字信息竖向居中 */
+          height: 100%;
+        }
+      }
+
+      /* 确保基础容器占满高度 */
+      #isPlaying {
+        min-height: 100vh;
+      }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;900&display=swap" rel="stylesheet">  
+</head>
+  <body>
+    <div id="coverBackground"></div>
+    <div id="colorBackground"></div>
+    <div id="notPlaying">
+      <div class="messages">
+        <p>当前没有播放内容：</p>
+        <button
+          type="button"
+          class="buttonZoneName buttonActive messages"
+          onclick="$('#overlayZoneList').show()"
+          name="区域列表"
+          aria-label="区域列表"
+        >
+          区域列表
+        </button>
+      </div>
+    </div>
+    <div id="isPlaying">
+      <div id="containerCoverImage"></div>
+      <div id="containerMusicInfo">
+        <div id="line1" class="colorChange textBold lineMusicInfo">&nbsp;</div>
+        <div id="line2" class="colorChange lineMusicInfo">&nbsp;</div>
+        <div id="line3" class="colorChange lineMusicInfo">&nbsp;</div>
+        <div id="controlsPlayer">
+          <button
+            type="button"
+            id="controlPrev"
+            class="buttonFillHeight playerButton"
+            name="上一曲"
+            aria-label="上一曲"
+          ></button>
+          <button
+            type="button"
+            id="controlPlayPauseStop"
+            class="buttonFillHeight playerButton"
+            name="播放/暂停"
+            aria-label="播放/暂停"
+          ></button>
+          <button
+            type="button"
+            id="controlNext"
+            class="buttonFillHeight playerButton"
+            name="下一曲"
+            aria-label="下一曲"
+          ></button>
+        </div>
+        <div id="containerTrackSeek">
+          <div id="trackSeek">
+            <div id="trackSeekValue">
+              <span id="seekPosition" class="left">&nbsp;</span>
+              <span id="seekLength" class="right">&nbsp;</span>
+            </div>
+          </div>
+        </div>
+        <div id="containerZoneList">
+          <button
+            type="button"
+            class="buttonZoneName buttonAvailable colorChange"
+            id="nowplayingZoneList"
+            onclick="$('#overlayZoneList').show()"
+            name="区域列表"
+            aria-label="区域列表"
+          >
+            区域列表
+          </button>
+        </div>
+        <div id="controlsSettings">
+          <button
+            type="button"
+            class="buttonFillHeight settingsButton"
+            id="buttonLoop"
+          ></button>
+          <button
+            type="button"
+            class="buttonFillHeight settingsButton"
+            id="buttonShuffle"
+          ></button>
+          <button
+            type="button"
+            class="buttonFillHeight settingsButton"
+            id="buttonRadio"
+          ></button>
+          <button
+            type="button"
+            class="buttonFillHeight settingsButton buttonAvailable"
+            id="buttonVolume"
+            onclick="$('#overlayVolume').show()"
+            name="显示音量控制"
+            aria-label="显示音量控制"
+          ></button>
+          <button
+            type="button"
+            class="buttonFillHeight settingsButton buttonAvailable"
+            id="buttonSettings"
+            onclick="$('#overlaySettings').show()"
+            name="显示设置"
+            aria-label="显示设置"
+          ></button>
+          <button
+            type="button"
+            class="buttonFillHeight settingsButton buttonAvailable"
+            id="buttonFullscreen"
+            onclick="toggleFullscreen()"
+            name="切换全屏"
+            aria-label="切换全屏"
+          ></button>
+        </div>
+      </div>
+    </div>
+    <div id="overlayVolume" class="overlay">
+      <div class="overlayBackground" onclick="$('#overlayVolume').hide()"></div>
+      <div class="overlayContent"><span id="volumeList"></span></div>
+    </div>
+    <div id="overlayZoneList" class="overlay">
+      <div
+        class="overlayBackground"
+        onclick="$('#overlayZoneList').hide()"
+      ></div>
+      <div class="overlayContent">
+        <span class="overlayList zoneList"></span>
+      </div>
+    </div>
+    <div id="overlaySettings" class="overlay">
+      <div
+        class="overlayBackground"
+        onclick="$('#overlaySettings').hide()"
+      ></div>
+      <div class="overlayContent">
+        <div class="overlayList settingsList">
+          <div class="overlayListRow">
+            <button
+              type="button"
+              class="buttonOverlay"
+              id="buttonThemeDark"
+              onclick="setTheme('dark')"
+              name="选择深色主题"
+              aria-label="选择深色主题"
+            >
+              深色
+            </button>
+            <button
+              type="button"
+              class="buttonOverlay"
+              id="buttonThemeColor"
+              onclick="setTheme('color')"
+              name="选择主色调主题"
+              aria-label="选择主色调主题"
+            >
+              主色调
+            </button>
+            <button
+              type="button"
+              class="buttonOverlay"
+              id="buttonThemeCover"
+              onclick="setTheme('cover')"
+              name="选择封面主题"
+              aria-label="选择封面主题"
+            >
+              封面
+            </button>
+          </div>
+          <hr />
+          <div class="overlayListRow">
+            <div class="textBold">通知</div>
+            <div>
+              <label class="settingsSwitch">
+                <input
+                  type="checkbox"
+                  id="notificationsSwitch"
+                  onclick="toggleNotifications()"
+                  name="切换歌曲变更桌面通知"
+                  aria-label="切换歌曲变更桌面通知"
+                />
+                <span class="settingsSlider"></span>
+              </label>
+            </div>
+          </div>
+          <hr />
+          <div class="overlayListRow">
+            <div class="textBold">使用圆形图标</div>
+            <div>
+              <label class="settingsSwitch">
+                <input
+                  type="checkbox"
+                  id="circleIconsSwitch"
+                  onclick="toggleCircleIcon()"
+                  name="切换播放控制使用圆形图标"
+                  aria-label="切换播放控制使用圆形图标"
+                />
+                <span class="settingsSlider"></span>
+              </label>
+            </div>
+          </div>
+          <hr />
+          <div class="overlayListRow">
+            <div class="textBold">使用4K图像</div>
+            <div>
+              <label class="settingsSwitch">
+                <input
+                  type="checkbox"
+                  id="4kImagesSwitch"
+                  onclick="toggle4kImages()"
+                  name="切换4K图像"
+                  aria-label="切换4K图像"
+                />
+                <span class="settingsSlider"></span>
+              </label>
+            </div>
+          </div>
+          <hr />
+          <div class="overlayListRow">
+            <div class="textBold">播放时禁用屏幕保护</div>
+            <div>
+              <label class="settingsSwitch">
+                <input
+                  type="checkbox"
+                  id="screensaverSwitch"
+                  onclick="toggleScreensaver()"
+                  name="切换播放时禁用屏幕保护"
+                  aria-label="切换播放时禁用屏幕保护"
+                />
+                <span class="settingsSlider"></span>
+              </label>
+            </div>
+          </div>
+          <hr />
+          <div class="overlayListRow">
+            <div class="textBold">滚动长文本</div>
+            <div>
+              <label class="settingsSwitch">
+                <input
+                  type="checkbox"
+                  id="scrollSwitch"
+                  onclick="toggleScroll()"
+                  name="切换长文本滚动"
+                  aria-label="切换长文本滚动"
+                />
+                <span class="settingsSlider"></span>
+              </label>
+            </div>
+          </div>
+          <hr />
+        </div>
+      </div>
+    </div>
+    <div id="pairDisabled" style="display: none;">
+      <div class="messages">
+        <h2>等待 Roon Core 授权</h2>
+        <p>请在 Roon Core 设置中启用此扩展</p>
+        <p>设置 → 扩展 → 启用 RoonAlbumArt</p>
+      </div>
+    </div>
+  </body>
+</html>

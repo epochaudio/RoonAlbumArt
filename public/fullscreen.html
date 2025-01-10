@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Music will keep us alive</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="apple-touch-icon" href="/favicons/apple-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="/favicons/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/favicons/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="/css/site.css" />
+    <script src="/jquery/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/color-thief.js"></script>
+    <script src="/js-cookie/js.cookie.js"></script>
+    <script src="/js/fullscreen.js"></script>
+    <script>
+      let mouseTimer;
+      let isButtonHovered = false;
+
+      // 检测是否为触摸屏设备
+      function isTouchDevice() {
+        return (('ontouchstart' in window) ||
+          (navigator.maxTouchPoints > 0) ||
+          (navigator.msMaxTouchPoints > 0));
+      }
+
+      // 处理鼠标移动
+      function handleMouseMove() {
+        if (isButtonHovered) return; // 如果鼠标在按钮上，不要隐藏
+        document.body.style.cursor = 'default';
+        clearTimeout(mouseTimer);
+        mouseTimer = setTimeout(() => {
+          if (!isButtonHovered) { // 再次检查鼠标是否在按钮上
+            document.body.style.cursor = 'none';
+          }
+        }, 1000); // 改为1秒后隐藏鼠标
+      }
+
+      // 检测是否为iOS设备
+      function isIOS() {
+        return [
+          'iPad Simulator',
+          'iPhone Simulator',
+          'iPod Simulator',
+          'iPad',
+          'iPhone',
+          'iPod'
+        ].includes(navigator.platform)
+        || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+      }
+
+      // 优化的全屏切换函数
+      function toggleFullScreen() {
+        try {
+          if (isIOS()) {
+            // iOS设备特殊处理
+            if (document.documentElement.webkitEnterFullscreen) {
+              document.documentElement.webkitEnterFullscreen();
+            } else if (document.body.webkitEnterFullscreen) {
+              document.body.webkitEnterFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+              document.documentElement.webkitRequestFullscreen();
+            }
+            return;
+          }
+
+          // 其他设备的处理
+          if (!document.fullscreenElement &&
+              !document.webkitFullscreenElement &&
+              !document.mozFullScreenElement &&
+              !document.msFullscreenElement) {
+            // 进入全屏
+            const element = document.documentElement;
+            if (element.requestFullscreen) {
+              element.requestFullscreen();
+            } else if (element.webkitRequestFullscreen) {
+              element.webkitRequestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+              element.mozRequestFullScreen();
+            } else if (element.msRequestFullscreen) {
+              element.msRequestFullscreen();
+            }
+          } else {
+            // 退出全屏
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+              document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+              document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+              document.msExitFullscreen();
+            }
+          }
+        } catch (err) {
+          console.log('全屏切换出错:', err);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const isTouch = isTouchDevice();
+        const hasShownTip = localStorage.getItem('hasShownFullscreenTip');
+        
+        // 移除原有的全屏按钮
+        const fullscreenButton = document.getElementById('fullscreenButton');
+        if (fullscreenButton) {
+          fullscreenButton.style.display = 'none';
+        }
+
+        // 添加鼠标移动监听
+        if (!isTouch) {
+          document.addEventListener('mousemove', handleMouseMove);
+          // 初始状态隐藏鼠标
+          setTimeout(() => {
+            document.body.style.cursor = 'none';
+          }, 1000);
+        }
+
+        // 为封面图片添加点击事件
+        const coverImage = document.getElementById('coverImage');
+        if (coverImage) {
+          coverImage.style.cursor = 'pointer';
+          coverImage.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleFullScreen();
+          });
+
+          if (!isTouch) {
+            // 非触摸设备：添加鼠标指针效果
+            coverImage.addEventListener('mouseenter', () => {
+              isButtonHovered = true;
+              document.body.style.cursor = 'pointer';
+            });
+            
+            coverImage.addEventListener('mouseleave', () => {
+              isButtonHovered = false;
+              handleMouseMove();
+            });
+          } else if (!hasShownTip) {
+            // 触摸设备：首次访问时显示提示，3秒后自动消失
+            const tip = document.createElement('div');
+            tip.className = 'fullscreen-tip';
+            tip.textContent = '点击封面切换全屏模式';
+            document.querySelector('.fullscreen-container').appendChild(tip);
+            
+            setTimeout(function() {
+              tip.style.opacity = '0';
+              setTimeout(() => tip.remove(), 500);
+            }, 3000);
+            
+            localStorage.setItem('hasShownFullscreenTip', 'true');
+          }
+        }
+
+        // 监听全屏状态变化
+        document.addEventListener('fullscreenchange', updateFullscreenState);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenState);
+        document.addEventListener('mozfullscreenchange', updateFullscreenState);
+        document.addEventListener('MSFullscreenChange', updateFullscreenState);
+
+        function updateFullscreenState() {
+          if (!isTouch) {
+            setTimeout(() => {
+              if (!isButtonHovered) {
+                document.body.style.cursor = 'none';
+              }
+            }, 1000);
+          }
+        }
+      });
+
+      // 监听 Socket.IO 连接状态
+      socket.on('pairStatus', function(status) {
+        const pairDisabled = document.getElementById('pairDisabled');
+        if (status.pairEnabled) {
+          if (pairDisabled) {
+            pairDisabled.style.display = 'none';
+          }
+        } else {
+          if (pairDisabled) {
+            pairDisabled.style.display = 'flex';
+          }
+        }
+      });
+    </script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .fullscreen-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        position: relative;
+      }
+
+      #coverImage {
+        width: 98vw;
+        height: auto;
+        max-height: 95vh;
+        object-fit: contain;
+        display: block;
+        transition: transform 0.3s ease;
+      }
+
+      /* 仅在非触摸设备上启用悬停效果 */
+      @media (hover: hover) {
+        #coverImage:hover {
+          transform: scale(1.02);
+        }
+      }
+
+      .fullscreen-hint {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        pointer-events: none;
+        opacity: 0.8;
+        z-index: 1000;
+      }
+
+      /* 触摸设备的提示样式 */
+      .fullscreen-tip {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        pointer-events: none;
+        opacity: 0.9;
+        z-index: 1000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        white-space: nowrap;
+        transition: opacity 0.5s ease;
+      }
+
+      #coverBackground {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        filter: blur(20px) opacity(0.3);
+      }
+
+      #colorBackground {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -2;
+        transition: background-color 1s ease;
+      }
+
+      #exitFullscreen {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        color: white;
+        cursor: pointer;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+        width: 48px;
+        height: 48px;
+        padding: 12px;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* 非触摸设备的按钮悬停效果 */
+      @media (hover: hover) {
+        #exitFullscreen:hover {
+          opacity: 1;
+          background: rgba(0, 0, 0, 0.9);
+          border-color: rgba(255, 255, 255, 0.5);
+          transform: scale(1.05);
+        }
+      }
+
+      #exitFullscreen svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      /* 按钮和可点击元素基础样式 */
+      button, #coverImage, #exitFullscreen {
+        transition: all 0.3s ease;
+        opacity: 0.8;
+      }
+
+      /* 非触摸设备的悬停效果 */
+      @media (hover: hover) {
+        button:hover, #coverImage:hover, #exitFullscreen:hover {
+          opacity: 1;
+          filter: brightness(1.2);
+        }
+      }
+
+      #pairDisabled {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      }
+
+      .messages {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 30px 50px;
+        border-radius: 15px;
+        text-align: center;
+        color: #fff;
+        font-size: 1.5em;
+        line-height: 1.5;
+        max-width: 80%;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+
+      .messages h2 {
+        margin: 0 0 20px 0;
+        color: #1d99f3;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="coverBackground"></div>
+    <div id="colorBackground"></div>
+    <button id="fullscreenButton" aria-label="进入全屏模式">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+    </button>
+    <div class="fullscreen-container">
+      <img id="coverImage" src="/img/transparent.png" alt="Album Cover">
+      <button id="exitFullscreen" onclick="window.location.href='/nowplaying.html'" aria-label="切换到播放控制页面">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="pairDisabled" style="display: none;">
+      <div class="messages">
+        <h2>等待 Roon Core 授权</h2>
+        <p>请在 Roon Core 设置中启用此扩展</p>
+        <p>设置 → 扩展 → 启用 RoonAlbumArt</p>
+      </div>
+    </div>
+  </body>
+</html>
